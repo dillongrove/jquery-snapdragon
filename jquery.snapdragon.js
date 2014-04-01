@@ -1,5 +1,7 @@
 ;(function($, window, document){
 
+    var pluginName = "snapDragon";
+
     function SnapDragon(element, options){
         // Store stome references to the element on the instance
         this.el = element;
@@ -37,7 +39,7 @@
         destroy: function() {
 
             // Remove attached data
-            this.$el.removeData("snapDragon");
+            this.$el.removeData(pluginName);
         },
 
     }
@@ -51,8 +53,8 @@
             // Creates a new plugin instance, for each selected element, and
             // stores a reference withint the element's data
             return this.each(function() {
-                if (!$.data(this, "snapDragon")) {
-                    $.data(this, "snapDragon", new SnapDragon(this, options));
+                if (!$.data(this, pluginName)) {
+                    $.data(this, pluginName, new SnapDragon(this, options));
                 }
             });
         } else {
@@ -67,7 +69,7 @@
 
     function handleDragStart(e){
         var target = $(e.delegateTarget);
-        target.data("snapDragon").dragStartLocation = getXPos(target);
+        target.data(pluginName).dragStartLocation = getXPos(target);
     }
 
     function handleTouchDrag(e){
@@ -83,7 +85,7 @@
         /* calculate the new X position using the current and the delta */
         var newXPos = currentXPos + delta;
 
-        var boundaries = target.data("snapDragon").options.boundaries;
+        var boundaries = target.data(pluginName).options.boundaries;
         if(boundaries){
             if(boundaries.right != undefined){
                 if(newXPos > boundaries.right){
@@ -119,7 +121,7 @@
         var currentXPos = getXPos(target);
 
         // Find out what the location was at the beginning of this drag
-        var dragStartLocation = target.data("snapDragon").dragStartLocation;
+        var dragStartLocation = target.data(pluginName).dragStartLocation;
 
         // See if that position was one of the defined snap positions
         var dragStartSnapPosition = getSnapPosition(target, dragStartLocation);
@@ -159,7 +161,7 @@
 
     /* Given a location, finds if there is a snap position there */
     function getSnapPosition(target, location){
-        var snapPositions = target.data("snapDragon").options.snapPositions;
+        var snapPositions = target.data(pluginName).options.snapPositions;
 
         for(var i=0; i < snapPositions.length; i++){
             var snapPosition = snapPositions[i];
@@ -173,7 +175,7 @@
 
     function getClosestSnapPos(target, excludedLocations){
         
-        var snapPositions = target.data("snapDragon").options.snapPositions;
+        var snapPositions = target.data(pluginName).options.snapPositions;
         var currentXPos = getXPos(target)
 
         var closest = -1;
