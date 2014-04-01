@@ -1,4 +1,4 @@
-(function($){
+;(function($, window, document){
 
     function SnapDragon(element, options){
         // Store stome references to the element on the instance
@@ -227,7 +227,7 @@
 
     };
 
-}(jQuery));
+}(jQuery, window, document));
 
 /*
 Notes: 
