@@ -1,7 +1,7 @@
 ;(function($, window, document){
 
     var pluginName = "snapDragon";
-
+    
     function SnapDragon(element, options){
         // Store stome references to the element on the instance
         this.el = element;
@@ -48,24 +48,28 @@
 
         var args = arguments;
 
-        /* an object of options (or nothing) was passed in */
+        // an object of options (or nothing) was passed in */
         if (options === undefined || typeof options === 'object') {
-            // Creates a new plugin instance, for each selected element, and
-            // stores a reference withint the element's data
+
+            // Create a new instance for each object in the selector and
+            // store a reference to the instance in the element's data.
+            // Returning the result of each so that chaining works.
             return this.each(function() {
                 if (!$.data(this, pluginName)) {
                     $.data(this, pluginName, new SnapDragon(this, options));
                 }
             });
+
         } else {
             // TODO
             // Call a public pluguin method (not starting with an underscore) for each 
             // selected element. (like destroy for example)
-            // 
+            //  
             // args used down here if necessarys
         }
 
     };
+
 
     function handleDragStart(e){
         var target = $(e.delegateTarget);
@@ -76,7 +80,6 @@
         e.gesture.preventDefault();
         var target = $(e.delegateTarget);
 
-        /* does this actually need to take t instead of e? */
         var delta = deltaFromLastDrag(e, target);
 
         /* get the current X translate of the invoice */
