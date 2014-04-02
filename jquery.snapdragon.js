@@ -149,9 +149,15 @@
         var distanceToSnap = Math.abs(getXPos(target) - location);
 
         if(distanceToSnap > 0){
+            // disable hammer detection while transitioning
+            var hammertime = target.data("hammer");
+            hammertime.enable(false);
+
             target.addClass("snapDragonTransition");
             target.css("-webkit-transform", "translateX("+location+"px)");
             target.one("webkitTransitionEnd", function(){
+                // re-enable hammer detection when done */
+                hammertime.enable(true);
                 target.removeClass("snapDragonTransition");
             });
         }
@@ -233,45 +239,3 @@
     };
 
 }(jQuery, window, document));
-
-/*
-Notes: 
-
-* Item must be display block or display inline-block in
-  order for -webkit-transform: translateX() to actually
-  work. Hm.
-
-*/
-
-/*
-Idea: 
-
-Right now, the issue is that the selector given to hammer (".parent") doesn't
-seem to be working because (".child") elements still get moved. This is because
-a touch event on the child element propogates up to the parent element and
-triggers the hammer event handler, but that same event handler works with
-(and changes the translateX of) the e.target, which is, by definition, the child
-not the parent. What we really want to do is operate on (this) because that's
-the element that actually received the event.
-
-Solution 1: Check if (this) == e.target, return if so
-
-Works to make the child not move, but doesn't let the event pass through to the
-parent, which is what we really want to do. For this to work, we'd have to
-put pointer-events none on the child(ren) which would make binding anything
-on those later (like click events) impossible. So that's a no-no.
-
-Solution 2: Check if e.target matches the selector given to hammer, if not, find
-the nearest parent that does, and operate on that.
-
-Seems like a good solution, though it means we'd have to pass the selector into
-the function (instead of just relying on the Hammer instance). Should work for
-multiple touches as well. Or maybe we can get the selector off the hammer
-instance, which should be stored on the data of the elements anyway?
-
-Solution 3: Is there a (this) on a per touch basis rather than an e.target?
-THis would probably be the easiest solution, though I doubt this is actually
-possibly. Could try console.logging the e and look through the object to see if
-it's there.
-
-*/
