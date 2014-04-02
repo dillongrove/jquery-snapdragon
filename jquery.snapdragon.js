@@ -42,6 +42,28 @@
             this.$el.removeData(pluginName);
         },
 
+        snapTo: function(location){
+            console.log("snapping to " + location);
+            var distanceToSnap = Math.abs(getXPos(this.$el) - location);
+
+            if(distanceToSnap > 0){
+                // disable hammer detection while transitioning
+                var hammertime = this.$el.data("hammer");
+                hammertime.enable(false);
+
+                this.$el.addClass("snapDragonTransition");
+                this.$el.css("-webkit-transform", "translateX("+location+"px)");
+
+                var that = this;
+
+                this.$el.one("webkitTransitionEnd", function(){
+                    // re-enable hammer detection when done */
+                    hammertime.enable(true);
+                    that.$el.removeClass("snapDragonTransition");
+                });
+            }
+        }
+
     }
 
     $.fn.snapDragon = function(options) {
@@ -134,32 +156,12 @@
             if(brokeThreshold(dragStartSnapPosition, currentXPos)){
                 var location = getClosestSnapPos(target, [dragStartSnapPosition.location]).location;
                 console.log("broke threshold");
-                snapTo(target, location);
+                target.data(pluginName).snapTo(location);
                 // it broke out of it's threshold, find a new position to snap to (or don't, maybe)
             } else {
                 console.log("didn't break threshold");
-                snapTo(target, dragStartSnapPosition.location);
+                target.data(pluginName).snapTo(dragStartSnapPosition.location);
             };
-        }
-
-    }
-
-    function snapTo(target, location){
-        console.log("snapping to " + location);
-        var distanceToSnap = Math.abs(getXPos(target) - location);
-
-        if(distanceToSnap > 0){
-            // disable hammer detection while transitioning
-            var hammertime = target.data("hammer");
-            hammertime.enable(false);
-
-            target.addClass("snapDragonTransition");
-            target.css("-webkit-transform", "translateX("+location+"px)");
-            target.one("webkitTransitionEnd", function(){
-                // re-enable hammer detection when done */
-                hammertime.enable(true);
-                target.removeClass("snapDragonTransition");
-            });
         }
 
     }
