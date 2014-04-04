@@ -47,20 +47,32 @@
             var distanceToSnap = Math.abs(getXPos(this.$el) - location);
 
             if(distanceToSnap > 0){
-                // disable hammer detection while transitioning
+                this.setPosition(location, true);
+            }
+        },
+
+        setPosition: function(position, withTransition){
+            if(withTransition == false || withTransition == undefined){
+                this.$el.css("-webkit-transform", "translateX("+position+"px)");
+            } else {
                 var hammertime = this.$el.data("hammer");
-                hammertime.enable(false);
+                if(hammertime){
+                    hammertime.enable(false);
+                }
 
                 this.$el.addClass("snapDragonTransition");
-                this.$el.css("-webkit-transform", "translateX("+location+"px)");
+                this.$el.css("-webkit-transform", "translateX("+position+"px)");
 
                 var that = this;
 
                 this.$el.one("webkitTransitionEnd", function(){
-                    // re-enable hammer detection when done */
-                    hammertime.enable(true);
+                    if(hammertime){
+                        hammertime.enable(true);
+                    }
+
                     that.$el.removeClass("snapDragonTransition");
-                });
+
+                })
             }
         }
 
@@ -76,6 +88,7 @@
             // Create a new instance for each object in the selector and
             // store a reference to the instance in the element's data.
             // Returning the result of each so that chaining works.
+
             return this.each(function() {
                 if (!$.data(this, pluginName)) {
                     $.data(this, pluginName, new SnapDragon(this, options));
@@ -124,8 +137,8 @@
             }
         }
 
-        /* finally set the new invoice X position */
-        target.css("-webkit-transform", "translateX("+newXPos+"px)");
+        var snapDragon = target.data("snapDragon");
+        snapDragon.setPosition(newXPos, false);
 
     }
 
