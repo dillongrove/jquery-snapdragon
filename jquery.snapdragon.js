@@ -52,27 +52,62 @@
         },
 
         setPosition: function(position, withTransition){
+            // if this particular instance of snapDragon has defined a moveAlso,
+            // it means we need to move something along with this element
+            if(this.options.moveAlso){
+                var otherElements = $(this.options.moveAlso.selector);
+            }
+
+            // if there are no other elements to move, just set the var to the
+            // empty jquery object so that the jquery methods below don't
+            // throw an error
+            otherElements = otherElements ? otherElements : $();
+
+            // if we're not using a transition (probably because were in the
+            // middle of a drag), we can just straight up set the new position
             if(withTransition == false || withTransition == undefined){
                 this.$el.css("-webkit-transform", "translateX("+position+"px)");
+                if(otherElements){
+                    // WARNING, this will break if moveFn is not defined
+                    // TODO: dont break if moveFn is not defined lols
+                    otherPosition = this.options.moveAlso.moveFn(position);
+                    otherElements.css("-webkit-transform", "translateX("+otherPosition+"px)");
+                }
+            // but if so, we probably need to snap to a location 
             } else {
+                // find and disable hammer during this transition
                 var hammertime = this.$el.data("hammer");
                 if(hammertime){
                     hammertime.enable(false);
                 }
 
+                // add transition class
                 this.$el.addClass("snapDragonTransition");
+                otherElements.addClass("snapDragonTransition");
+
+                // set new positions
                 this.$el.css("-webkit-transform", "translateX("+position+"px)");
 
+                if(otherElements){
+                    otherPosition = this.options.moveAlso.moveFn(position);
+                    otherElements.css("-webkit-transform", "translateX("+otherPosition+"px)");
+                }
+
+                // save reference for this next event handler function
                 var that = this;
 
+                // .one() runs and then unbinds itself
                 this.$el.one("webkitTransitionEnd", function(){
+                    // after transition is done, re-enable hammer
                     if(hammertime){
                         hammertime.enable(true);
                     }
 
+                    // ...and remove the transition class
                     that.$el.removeClass("snapDragonTransition");
+                    otherElements.removeClass("snapDragonTransition");
 
-                })
+                });
             }
         }
 
