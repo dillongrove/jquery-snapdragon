@@ -67,7 +67,7 @@
             // middle of a drag), we can just straight up set the new position
             if(withTransition == false || withTransition == undefined){
                 this.$el.css("-webkit-transform", "translateX("+position+"px)");
-                if(otherElements){
+                if(otherElements.length != 0){
                     // WARNING, this will break if moveFn is not defined
                     // TODO: dont break if moveFn is not defined lols
                     otherPosition = this.options.moveAlso.moveFn(position);
@@ -88,7 +88,7 @@
                 // set new positions
                 this.$el.css("-webkit-transform", "translateX("+position+"px)");
 
-                if(otherElements){
+                if(otherElements.length != 0){
                     otherPosition = this.options.moveAlso.moveFn(position);
                     otherElements.css("-webkit-transform", "translateX("+otherPosition+"px)");
                 }
