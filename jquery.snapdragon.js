@@ -43,7 +43,6 @@
         },
 
         snapTo: function(location){
-            console.log("snapping to " + location);
             var distanceToSnap = Math.abs(getXPos(this.$el) - location);
 
             if(distanceToSnap > 0){
@@ -200,14 +199,11 @@
         var dragStartSnapPosition = getSnapPosition(target, dragStartLocation);
         
         if(dragStartSnapPosition !== undefined){
-            console.log("drag started at a snap position");
             if(brokeThreshold(dragStartSnapPosition, currentXPos)){
                 var location = getClosestSnapPos(target, [dragStartSnapPosition.location]).location;
-                console.log("broke threshold");
                 target.data(pluginName).snapTo(location);
                 // it broke out of it's threshold, find a new position to snap to (or don't, maybe)
             } else {
-                console.log("didn't break threshold");
                 target.data(pluginName).snapTo(dragStartSnapPosition.location);
             };
         }
