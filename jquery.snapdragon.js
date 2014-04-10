@@ -20,17 +20,14 @@
             var hammertime = this.$el.data("hammer");
 
             hammertime.on("dragstart", function(e){
-                e.stopPropagation();
                 handleDragStart(e);
             });
 
-            hammertime.on("touch drag", function(e){
-                e.stopPropagation();        
+            hammertime.on("drag", function(e){     
                 handleTouchDrag(e);
             });
 
             hammertime.on("dragend", function(e){
-                e.stopPropagation();
                 handleDragEnd(e);
             });
 
