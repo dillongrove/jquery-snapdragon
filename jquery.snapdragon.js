@@ -143,7 +143,6 @@
     }
 
     function handleTouchDrag(e){
-        e.gesture.preventDefault();
         var target = $(e.delegateTarget);
 
         var delta = deltaFromLastDrag(e, target);
@@ -174,7 +173,6 @@
     }
 
     function handleDragEnd(e){
-        e.gesture.preventDefault();
         var target = $(e.delegateTarget);
 
         /* get the current X translate of the invoice */
