@@ -16,6 +16,8 @@
     SnapDragon.prototype = {
 
         init: function(){
+            var that = this;
+
             // get the hammer instance
             var hammertime = this.$el.data("hammer");
 
@@ -23,8 +25,15 @@
                 handleDragStart(e);
             });
 
-            hammertime.on("drag", function(e){     
-                handleTouchDrag(e);
+            hammertime.on("drag", function(e){   
+                if(that.options.ignore_vertical_drags){
+                    // only handle drag events on left/right drags
+                    if(e.gesture.direction == "left" || e.gesture.direction == "right"){
+                        handleTouchDrag(e);
+                    }
+                } else {
+                    handleTouchDrag(e);
+                }
             });
 
             hammertime.on("dragend", function(e){
@@ -276,7 +285,7 @@
     }
 
     $.fn.snapDragon.defaults = {
-
+        ignore_vertical_drags: true
     };
 
 }(jQuery, window, document));
