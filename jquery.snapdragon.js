@@ -230,11 +230,15 @@
 
 
     function handleDragStart(e, snapDragonInstance){
+        e.stopPropagation();
+
         var target = $(e.delegateTarget);
         snapDragonInstance.dragStartLocation = getXPos(target);
     }
 
     function handleTouchDrag(e, snapDragonInstance){
+        e.stopPropagation();
+
         var target = $(e.delegateTarget);
 
         var delta = deltaFromLastDrag(e, target);
@@ -264,6 +268,8 @@
     }
 
     function handleDragEnd(e, snapDragonInstance){
+        e.stopPropagation();
+        
         var target = $(e.delegateTarget);
 
         /* get the current X translate of the invoice */
