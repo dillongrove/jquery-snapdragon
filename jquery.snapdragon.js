@@ -63,7 +63,6 @@
 
         enable: function() {
             this.enabled = true;
-            console.log("enabling");
         },
 
         disable: function(){
