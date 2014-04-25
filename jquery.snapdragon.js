@@ -25,7 +25,7 @@
 
             hammertime.on("dragstart", function(e){
                 if(that.enabled){
-                    handleDragStart(e);
+                    handleDragStart(e, that);
                 }
             });
 
@@ -34,20 +34,21 @@
                     if(that.options.ignore_vertical_drags){
                         // only handle drag events on left/right drags
                         if(e.gesture.direction == "left" || e.gesture.direction == "right"){
-                            handleTouchDrag(e);
+                            handleTouchDrag(e, that);
                         }
                     } else {
-                        handleTouchDrag(e);
+                        handleTouchDrag(e, that);
                     }
                 }
             });
 
             hammertime.on("dragend", function(e){
                 if(that.enabled){
-                    handleDragEnd(e);
+                    handleDragEnd(e, that);
                 }
             });
 
+            // if the options dictate, immediately disable after init
             if(this.options.initDisabled){
                 this.disable();
             }
@@ -82,7 +83,12 @@
         // location
         snapToSnapPos: function(snapPos){
             if(typeof snapPos == "number"){
-                // get snapPos at that number
+                var snapPos = this.getSnapPosition(snapPos);
+                if(snapPos == undefined){
+                    throw Error("No snap position at location: " + snapPos);
+                } else {
+                    this.snapToSnapPos(snapPos);
+                }
             } else if (typeof snapPos == "object"){
                 // we probably have a snapPos, snap to it
                 var location = snapPos.location;
@@ -106,6 +112,20 @@
                 this.snapToLocation(destination);
             }
 
+        },
+
+        /* Given a location, finds if there is a snap position there */
+        getSnapPosition: function(location){
+            var snapPositions = this.options.snapPositions;
+
+            for(var i=0; i < snapPositions.length; i++){
+                var snapPosition = snapPositions[i];
+                if(snapPosition.location == location){
+                    return snapPosition;
+                }
+            }
+
+            return undefined;
         },
 
         setPosition: function(position, withTransition, callback){
@@ -210,12 +230,12 @@
     };
 
 
-    function handleDragStart(e){
+    function handleDragStart(e, snapDragonInstance){
         var target = $(e.delegateTarget);
-        target.data(pluginName).dragStartLocation = getXPos(target);
+        snapDragonInstance.dragStartLocation = getXPos(target);
     }
 
-    function handleTouchDrag(e){
+    function handleTouchDrag(e, snapDragonInstance){
         var target = $(e.delegateTarget);
 
         var delta = deltaFromLastDrag(e, target);
@@ -240,12 +260,11 @@
             }
         }
 
-        var snapDragon = target.data("snapDragon");
-        snapDragon.setPosition(newXPos, false);
+        snapDragonInstance.setPosition(newXPos, false);
 
     }
 
-    function handleDragEnd(e){
+    function handleDragEnd(e, snapDragonInstance){
         var target = $(e.delegateTarget);
 
         /* get the current X translate of the invoice */
@@ -264,7 +283,7 @@
         var dragStartLocation = target.data(pluginName).dragStartLocation;
 
         // See if that position was one of the defined snap positions
-        var dragStartSnapPosition = getSnapPosition(target, dragStartLocation);
+        var dragStartSnapPosition = snapDragonInstance.getSnapPosition(dragStartLocation);
         
         if(dragStartSnapPosition !== undefined){
             if(brokeThreshold(dragStartSnapPosition, currentXPos)){
@@ -280,20 +299,6 @@
 
     function brokeThreshold(snapPosition, currentXPos){
         return (Math.abs(currentXPos - snapPosition.location) > snapPosition.threshold);
-    }
-
-    /* Given a location, finds if there is a snap position there */
-    function getSnapPosition(target, location){
-        var snapPositions = target.data(pluginName).options.snapPositions;
-
-        for(var i=0; i < snapPositions.length; i++){
-            var snapPosition = snapPositions[i];
-            if(snapPosition.location == location){
-                return snapPosition;
-            }
-        }
-
-        return undefined;
     }
 
     function getClosestSnapPos(target, excludedLocations){
