@@ -7,6 +7,8 @@
         this.el = element;
         this.$el = $(element);
 
+        this.enabled = true;
+
         // Merge passed options with defaults
         this.options = $.extend({}, $.fn.snapDragon.defaults, options);
 
@@ -22,22 +24,28 @@
             var hammertime = this.$el.data("hammer");
 
             hammertime.on("dragstart", function(e){
-                handleDragStart(e);
+                if(that.enabled){
+                    handleDragStart(e);
+                }
             });
 
             hammertime.on("drag", function(e){   
-                if(that.options.ignore_vertical_drags){
-                    // only handle drag events on left/right drags
-                    if(e.gesture.direction == "left" || e.gesture.direction == "right"){
+                if(that.enabled){
+                    if(that.options.ignore_vertical_drags){
+                        // only handle drag events on left/right drags
+                        if(e.gesture.direction == "left" || e.gesture.direction == "right"){
+                            handleTouchDrag(e);
+                        }
+                    } else {
                         handleTouchDrag(e);
                     }
-                } else {
-                    handleTouchDrag(e);
                 }
             });
 
             hammertime.on("dragend", function(e){
-                handleDragEnd(e);
+                if(that.enabled){
+                    handleDragEnd(e);
+                }
             });
 
         },
@@ -46,6 +54,14 @@
 
             // Remove attached data
             this.$el.removeData(pluginName);
+        },
+
+        enable: function() {
+            this.enabled = true;
+        },
+
+        disable: function(){
+            this.enabled = false;
         },
 
         // Given a location or snapLocation obj, snaps to it
@@ -80,6 +96,11 @@
             // empty jquery object so that the jquery methods below don't
             // throw an error
             otherElements = otherElements ? otherElements : $();
+
+            // call the moveCallback if there is one
+            if(snapDragonInstance.options.moveCallback){
+                snapDragonInstance.options.moveCallback(position, withTransition);
+            }
 
             // if we're not using a transition (probably because were in the
             // middle of a drag), we can just straight up set the new position
@@ -155,7 +176,7 @@
 
         } else {
             // TODO
-            // Call a public pluguin method (not starting with an underscore) for each 
+            // Call a public plugin method (not starting with an underscore) for each 
             // selected element. (like destroy for example)
             //  
             // args used down here if necessarys
