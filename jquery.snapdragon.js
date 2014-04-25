@@ -48,15 +48,26 @@
             this.$el.removeData(pluginName);
         },
 
-        snapTo: function(location){
-            var distanceToSnap = Math.abs(getXPos(this.$el) - location);
-
-            if(distanceToSnap > 0){
-                this.setPosition(location, true);
+        // Given a location or snapLocation obj, snaps to it
+        snapTo: function(destination){
+            if(typeof destination == "object"){
+                var location = destination.location;
+                var distanceToSnap = Math.abs(getXPos(this.$el) - location);
+                if(distanceToSnap > 0){
+                    // pass along this snapPosition's callback
+                    this.setPosition(location, true, destination.callback);
+                }
+            } else {
+                var location = destination;
+                var distanceToSnap = Math.abs(getXPos(this.$el) - location);
+                if(distanceToSnap > 0){
+                    this.setPosition(location, true);
+                }
             }
+
         },
 
-        setPosition: function(position, withTransition){
+        setPosition: function(position, withTransition, callback){
             // if this particular instance of snapDragon has defined a moveAlso,
             // it means we need to move something along with this element
             if(this.options.moveAlso){
@@ -111,6 +122,11 @@
                     // ...and remove the transition class
                     that.$el.removeClass("snapDragonTransition");
                     otherElements.removeClass("snapDragonTransition");
+
+                    //...and call the callback, if there was one
+                    if(callback !== undefined){
+                        callback();
+                    }
 
                 });
             }
@@ -204,11 +220,11 @@
         
         if(dragStartSnapPosition !== undefined){
             if(brokeThreshold(dragStartSnapPosition, currentXPos)){
-                var location = getClosestSnapPos(target, [dragStartSnapPosition.location]).location;
-                target.data(pluginName).snapTo(location);
+                var snapPos = getClosestSnapPos(target, [dragStartSnapPosition.location]);
+                target.data(pluginName).snapTo(snapPos);
                 // it broke out of it's threshold, find a new position to snap to (or don't, maybe)
             } else {
-                target.data(pluginName).snapTo(dragStartSnapPosition.location);
+                target.data(pluginName).snapTo(dragStartSnapPosition);
             };
         }
 
