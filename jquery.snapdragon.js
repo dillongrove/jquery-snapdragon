@@ -48,6 +48,10 @@
                 }
             });
 
+            if(this.options.initDisabled){
+                this.disable();
+            }
+
         },
 
         destroy: function() {
@@ -58,27 +62,48 @@
 
         enable: function() {
             this.enabled = true;
+            console.log("enabling");
         },
 
         disable: function(){
             this.enabled = false;
         },
 
-        // Given a location or snapLocation obj, snaps to it
-        snapTo: function(destination){
-            if(typeof destination == "object"){
-                var location = destination.location;
+        // Given a location, snap to it
+        snapToLocation: function(location){
+            var distanceToSnap = Math.abs(getXPos(this.$el) - location);
+            if(distanceToSnap > 0){
+                this.setPosition(location, true);
+            }
+        },
+
+        // Given a snapPos, snap to it
+        // If a location is passed isntead, attempt to find the snapPos at that
+        // location
+        snapToSnapPos: function(snapPos){
+            if(typeof snapPos == "number"){
+                // get snapPos at that number
+            } else if (typeof snapPos == "object"){
+                // we probably have a snapPos, snap to it
+                var location = snapPos.location;
                 var distanceToSnap = Math.abs(getXPos(this.$el) - location);
                 if(distanceToSnap > 0){
                     // pass along this snapPosition's callback
-                    this.setPosition(location, true, destination.callback);
+                    this.setPosition(location, true, snapPos.callback);
                 }
             } else {
-                var location = destination;
-                var distanceToSnap = Math.abs(getXPos(this.$el) - location);
-                if(distanceToSnap > 0){
-                    this.setPosition(location, true);
-                }
+                // throw error
+            }
+
+        },
+
+        // Figures out whether the destination is a position or a snapPos and 
+        // calls the appropriate function
+        snapTo: function(destination){
+            if(typeof destination == "object"){
+                this.snapToSnapPos(destination);
+            } else {
+                this.snapToLocation(destination);
             }
 
         },
