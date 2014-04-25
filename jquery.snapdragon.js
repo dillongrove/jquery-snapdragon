@@ -68,6 +68,8 @@
         },
 
         setPosition: function(position, withTransition, callback){
+            var snapDragonInstance = this;
+
             // if this particular instance of snapDragon has defined a moveAlso,
             // it means we need to move something along with this element
             if(this.options.moveAlso){
@@ -125,7 +127,7 @@
 
                     //...and call the callback, if there was one
                     if(callback !== undefined){
-                        callback();
+                        callback(snapDragonInstance);
                     }
 
                 });
