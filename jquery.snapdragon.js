@@ -149,12 +149,12 @@
             // if we're not using a transition (probably because were in the
             // middle of a drag), we can just straight up set the new position
             if(withTransition == false || withTransition == undefined){
-                this.$el.css("-webkit-transform", "translateX("+position+"px)");
+                this.$el.css("-webkit-transform", "translate3d("+position+"px" + ", 0, 0)");
                 if(otherElements.length != 0){
                     // WARNING, this will break if moveFn is not defined
                     // TODO: dont break if moveFn is not defined lols
                     otherPosition = this.options.moveAlso.moveFn(position);
-                    otherElements.css("-webkit-transform", "translateX("+otherPosition+"px)");
+                    otherElements.css("-webkit-transform", "translate3d("+otherPosition+"px" + ", 0, 0)");
                 }
             // but if so, we probably need to snap to a location 
             } else {
@@ -169,11 +169,11 @@
                 otherElements.addClass("snapDragonTransition");
 
                 // set new positions
-                this.$el.css("-webkit-transform", "translateX("+position+"px)");
+                this.$el.css("-webkit-transform", "translate3d("+position+"px" + ", 0, 0)");
 
                 if(otherElements.length != 0){
                     otherPosition = this.options.moveAlso.moveFn(position);
-                    otherElements.css("-webkit-transform", "translateX("+otherPosition+"px)");
+                    otherElements.css("-webkit-transform", "translate3d("+otherPosition+"px" + ", 0, 0)");
                 }
 
                 // save reference for this next event handler function
@@ -269,7 +269,7 @@
 
     function handleDragEnd(e, snapDragonInstance){
         e.stopPropagation();
-        
+
         var target = $(e.delegateTarget);
 
         /* get the current X translate of the invoice */
