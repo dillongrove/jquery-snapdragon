@@ -132,16 +132,9 @@
         setPosition: function(position, withTransition, callback){
             var snapDragonInstance = this;
 
-            // if this particular instance of snapDragon has defined a moveAlso,
-            // it means we need to move something along with this element
-            if(this.options.moveAlso){
-                var otherElements = $(this.options.moveAlso.selector);
-            }
-
-            // if there are no other elements to move, just set the var to the
-            // empty jquery object so that the jquery methods below don't
-            // throw an error
-            otherElements = otherElements ? otherElements : $();
+            // if this particular instance of snapDragon has linked elements,
+            // it means we need to move them along with this element
+            linked = this.options.linkedElements ? this.options.linkedElements : []
 
             // call the moveCallback if there is one
             if(snapDragonInstance.options.moveCallback){
@@ -152,11 +145,11 @@
             // middle of a drag), we can just straight up set the new position
             if(withTransition == false || withTransition == undefined){
                 this.$el.css("-webkit-transform", "translate3d("+position+"px" + ", 0, 0)");
-                if(otherElements.length != 0){
-                    // WARNING, this will break if moveFn is not defined
-                    // TODO: dont break if moveFn is not defined lols
-                    otherPosition = this.options.moveAlso.moveFn(position);
-                    otherElements.css("-webkit-transform", "translate3d("+otherPosition+"px" + ", 0, 0)");
+
+                for(var i=0; i<linked.length; i++){
+                    var link = linked[i];
+                    otherPosition = link.moveFn !== undefined ? link.moveFn(position) : position;
+                    $(link.selector).css("-webkit-transform", "translate3d("+otherPosition+"px" + ", 0, 0)");
                 }
 
                 //...and call the callback, if there was one
@@ -173,14 +166,18 @@
 
                 // add transition class
                 this.$el.addClass("snapDragonTransition");
-                otherElements.addClass("snapDragonTransition");
+
+                for(var i=0; i<linked.length; i++){
+                    $(linked[i].selector).addClass("snapDragonTransition");
+                }
 
                 // set new positions
                 this.$el.css("-webkit-transform", "translate3d("+position+"px" + ", 0, 0)");
 
-                if(otherElements.length != 0){
-                    otherPosition = this.options.moveAlso.moveFn(position);
-                    otherElements.css("-webkit-transform", "translate3d("+otherPosition+"px" + ", 0, 0)");
+                for(var i=0; i<linked.length; i++){
+                    var link = linked[i];
+                    otherPosition = link.moveFn !== undefined ? link.moveFn(position) : position;
+                    $(link.selector).css("-webkit-transform", "translate3d("+otherPosition+"px" + ", 0, 0)");
                 }
 
                 // save reference for this next event handler function
@@ -195,7 +192,9 @@
 
                     // ...and remove the transition class
                     that.$el.removeClass("snapDragonTransition");
-                    otherElements.removeClass("snapDragonTransition");
+                    for(var i=0; i<linked.length; i++){
+                        $(linked[i].selector).removeClass("snapDragonTransition");
+                    }
 
                     //...and call the callback, if there was one
                     if(callback !== undefined){
