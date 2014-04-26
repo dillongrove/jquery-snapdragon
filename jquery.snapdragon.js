@@ -95,6 +95,8 @@
                 if(distanceToSnap > 0){
                     // pass along this snapPosition's callback
                     this.setPosition(location, true, snapPos.callback);
+                } else {
+                    this.setPosition(location, false, snapPos.callback);
                 }
             } else {
                 // throw error
@@ -155,6 +157,11 @@
                     // TODO: dont break if moveFn is not defined lols
                     otherPosition = this.options.moveAlso.moveFn(position);
                     otherElements.css("-webkit-transform", "translate3d("+otherPosition+"px" + ", 0, 0)");
+                }
+
+                //...and call the callback, if there was one
+                if(callback !== undefined){
+                    callback(snapDragonInstance);
                 }
             // but if so, we probably need to snap to a location 
             } else {
